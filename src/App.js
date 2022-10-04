@@ -9,11 +9,14 @@ import polygonLogo from "./assets/polygonlogo.png";
 import ethLogo from "./assets/ethlogo.png";
 import { networks } from "./utils/networks";
 import Popup from "./helper/popup";
+import svgGen from "./utils/svgGen.js";
+import {Buffer} from 'buffer';
+
 
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const tld = ".keftes";
-const CONTRACT_ADDRESS = "0xAE9e7807bD1d6B9581bB20F2bDF1A448aCddd1D1";
+const CONTRACT_ADDRESS = "0x5Ad4a56B626BD37EE75938bf6c7BfAAd272F4de5";
 
 const App = () => {
   //Just a state variable we use to store our user's public wallet. Don't forget to import useState at the top.
@@ -26,14 +29,22 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [mints, setMints] = useState([]);
-  const [fileImg, setFileImg] = useState(null);
+  const [ImgHash, setImgHash] = useState("");
 
-  const sendFileToIPFS = async (e) => {
-    if (fileImg) {
+  const sendFileToIPFS = async () => {
+
+    var svgPartOne = '<svg xmlns="http://www.w3.org/2000/svg" width="270" height="270" fill="none"><path fill="url(#B)" d="M0 0h270v270H0z"/><defs><filter id="A" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse" height="270" width="270"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity=".225" width="200%" height="200%"/></filter></defs><path d="M72.863 42.949c-.668-.387-1.426-.59-2.197-.59s-1.529.204-2.197.59l-10.081 6.032-6.85 3.934-10.081 6.032c-.668.387-1.426.59-2.197.59s-1.529-.204-2.197-.59l-8.013-4.721a4.52 4.52 0 0 1-1.589-1.616c-.384-.665-.594-1.418-.608-2.187v-9.31c-.013-.775.185-1.538.572-2.208a4.25 4.25 0 0 1 1.625-1.595l7.884-4.59c.668-.387 1.426-.59 2.197-.59s1.529.204 2.197.59l7.884 4.59a4.52 4.52 0 0 1 1.589 1.616c.384.665.594 1.418.608 2.187v6.032l6.85-4.065v-6.032c.013-.775-.185-1.538-.572-2.208a4.25 4.25 0 0 0-1.625-1.595L41.456 24.59c-.668-.387-1.426-.59-2.197-.59s-1.529.204-2.197.59l-14.864 8.655a4.25 4.25 0 0 0-1.625 1.595c-.387.67-.585 1.434-.572 2.208v17.441c-.013.775.185 1.538.572 2.208a4.25 4.25 0 0 0 1.625 1.595l14.864 8.655c.668.387 1.426.59 2.197.59s1.529-.204 2.197-.59l10.081-5.901 6.85-4.065 10.081-5.901c.668-.387 1.426-.59 2.197-.59s1.529.204 2.197.59l7.884 4.59a4.52 4.52 0 0 1 1.589 1.616c.384.665.594 1.418.608 2.187v9.311c.013.775-.185 1.538-.572 2.208a4.25 4.25 0 0 1-1.625 1.595l-7.884 4.721c-.668.387-1.426.59-2.197.59s-1.529-.204-2.197-.59l-7.884-4.59a4.52 4.52 0 0 1-1.589-1.616c-.385-.665-.594-1.418-.608-2.187v-6.032l-6.85 4.065v6.032c-.013.775.185 1.538.572 2.208a4.25 4.25 0 0 0 1.625 1.595l14.864 8.655c.668.387 1.426.59 2.197.59s1.529-.204 2.197-.59l14.864-8.655c.657-.394 1.204-.95 1.589-1.616s.594-1.418.609-2.187V55.538c.013-.775-.185-1.538-.572-2.208a4.25 4.25 0 0 0-1.625-1.595l-14.993-8.786z" fill="#fff"/><defs><linearGradient id="B" x1="0" y1="0" x2="270" y2="270" gradientUnits="userSpaceOnUse"><stop stop-color="#cb5eee"/><stop offset="1" stop-color="#0cd7e4" stop-opacity=".99"/></linearGradient></defs><text x="32.5" y="231" font-size="27" fill="#fff" filter="url(#A)" font-family="Plus Jakarta Sans,DejaVu Sans,Noto Color Emoji,Apple Color Emoji,sans-serif" font-weight="bold">';
+    var svgPartTwo = '</text></svg>';
+
+    const svg = svgPartOne+domain+tld+svgPartTwo;
+    const blob = new Blob([svg], {type: 'image/svg+xml'});
+
+    if (blob) {
       try {
         const formData = new FormData();
-        formData.append("file", fileImg);
-
+        formData.append('file', blob, {
+          filename: 'content.svg'
+        });
         const resFile = await axios({
           method: "post",
           url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -45,7 +56,7 @@ const App = () => {
           },
         });
 
-        const ImgHash = `ipfs://${resFile.data.IpfsHash}`;
+        setImgHash(`ipfs://${resFile.data.IpfsHash}`);
         console.log(ImgHash);
         //Take a look at your Pinata Pinned section, you will see a new file added to you list.
       } catch (error) {
@@ -114,9 +125,9 @@ const App = () => {
           contractAbi.abi,
           signer
         );
-
+        sendFileToIPFS();
         console.log("Going to pop wallet now to pay gas...");
-        let tx = await contract.register(domain, {
+        let tx = await contract.register(domain, ImgHash, {
           value: ethers.utils.parseEther(price),
         });
         // Wait for the transaction to be mined
