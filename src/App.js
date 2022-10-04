@@ -9,8 +9,6 @@ import polygonLogo from "./assets/polygonlogo.png";
 import ethLogo from "./assets/ethlogo.png";
 import { networks } from "./utils/networks";
 import Popup from "./helper/popup";
-import svgGen from "./utils/svgGen.js";
-import {Buffer} from 'buffer';
 
 
 const TWITTER_HANDLE = "_buildspace";
