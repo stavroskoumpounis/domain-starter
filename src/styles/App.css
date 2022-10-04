@@ -54,6 +54,7 @@ header{
 .right{
   display: flex;
   background: black;
+  white-space: nowrap;
   border-radius: 16px;
   padding: 12px 20px;
   height: 99%;
@@ -69,8 +70,21 @@ header{
   height: 45px;
   border: 0;
   width: auto;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+.cta-button-connectedWal {
+  height: 40px;
+  border: 0;
+  width: auto;
+  padding-left: auto;
+  padding-right: auto;
   border-radius: 10px;
   cursor: pointer;
   font-size: 16px;
@@ -98,6 +112,20 @@ header{
     #f99185 52%,
     #cf556c 78%,
     #b12a5b 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
+}
+
+.connect-wallet-button2 {
+  background-image: linear-gradient(
+    to right,
+    #66af25 0%,
+    #61a624 0%,
+    #488c10 21%,
+    #2a5908 52%,
+    #294411 78%,
+    #21370e 100%
   );
   background-size: 200% 200%;
   animation: gradient-animation 4s ease infinite;
